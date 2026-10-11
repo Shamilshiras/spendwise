@@ -1,7 +1,3 @@
-/* ==========================================================================
-   SpendWise - Modern Responsive Stylesheet
-   ========================================================================== */
-
 :root {
   --primary: #4f46e5;
   --primary-hover: #4338ca;
@@ -67,9 +63,7 @@ body {
   flex-direction: column;
 }
 
-/* --------------------------------------------------------------------------
-   Header & Navigation
-   -------------------------------------------------------------------------- */
+
 .navbar {
   background-color: #ffffff;
   border-bottom: 1px solid var(--border-color);
@@ -193,9 +187,6 @@ body {
   color: var(--gray-700);
 }
 
-/* --------------------------------------------------------------------------
-   Layout & Container
-   -------------------------------------------------------------------------- */
 .main-wrapper {
   max-width: 1200px;
   width: 100%;
@@ -205,9 +196,6 @@ body {
   min-width: 0;
 }
 
-/* --------------------------------------------------------------------------
-   Messages & Alerts
-   -------------------------------------------------------------------------- */
 .alerts-container {
   margin-bottom: 1.5rem;
 }
@@ -241,9 +229,6 @@ body {
   border: 1px solid #bfdbfe;
 }
 
-/* --------------------------------------------------------------------------
-   Page Header
-   -------------------------------------------------------------------------- */
 .page-header {
   display: flex;
   align-items: center;
@@ -266,9 +251,6 @@ body {
   margin-top: 0.2rem;
 }
 
-/* --------------------------------------------------------------------------
-   Buttons & Badges
-   -------------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -335,7 +317,7 @@ body {
   border: 1px solid #c7d2fe;
 }
 
-/* Category specific colors */
+
 .badge-Food { background-color: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
 .badge-Fuel { background-color: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
 .badge-Travel { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
@@ -345,9 +327,6 @@ body {
 .badge-Gym { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
 .badge-Hospital { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
 
-/* --------------------------------------------------------------------------
-   Cards & Grids
-   -------------------------------------------------------------------------- */
 .card {
   background-color: var(--card-bg);
   border-radius: var(--radius-lg);
@@ -382,7 +361,6 @@ body {
   width: 100%;
 }
 
-/* Summary Cards Grid */
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
@@ -451,9 +429,6 @@ body {
   margin-top: 0.4rem;
 }
 
-/* --------------------------------------------------------------------------
-   Dashboard Charts Layout (Dynamic Resizing Support)
-   -------------------------------------------------------------------------- */
 .charts-grid-two {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
@@ -482,8 +457,6 @@ body {
   text-align: center;
 }
 
-/* Important for Chart.js dynamic resize:
-   Explicit height + position: relative + width: 100% + min-width: 0 */
 .chart-wrapper {
   position: relative;
   width: 100%;
@@ -518,9 +491,6 @@ body {
   color: var(--gray-900);
 }
 
-/* --------------------------------------------------------------------------
-   Tables
-   -------------------------------------------------------------------------- */
 .table-responsive {
   width: 100%;
   overflow-x: auto;
@@ -569,9 +539,7 @@ body {
   margin-left: 0.25rem;
 }
 
-/* --------------------------------------------------------------------------
-   Forms & Filters
-   -------------------------------------------------------------------------- */
+
 .filter-card {
   background-color: #ffffff;
   border-radius: var(--radius-md);
@@ -630,9 +598,6 @@ body {
   gap: 0.5rem;
 }
 
-/* --------------------------------------------------------------------------
-   Auth / Login Card
-   -------------------------------------------------------------------------- */
 .auth-wrapper {
   min-height: calc(100vh - 120px);
   display: flex;
@@ -671,9 +636,6 @@ body {
   box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
 }
 
-/* --------------------------------------------------------------------------
-   Pagination & Empty States
-   -------------------------------------------------------------------------- */
 .pagination {
   display: flex;
   align-items: center;
@@ -714,9 +676,6 @@ body {
   margin: 0 auto 1.25rem;
 }
 
-/* --------------------------------------------------------------------------
-   Mobile Cards for Table Alternative
-   -------------------------------------------------------------------------- */
 .mobile-card-list {
   display: none;
   flex-direction: column;
@@ -752,9 +711,6 @@ body {
   padding-top: 0.65rem;
 }
 
-/* --------------------------------------------------------------------------
-   Responsive Media Queries
-   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .main-wrapper {
     padding: 1.25rem 0.85rem 2.5rem;
@@ -806,7 +762,6 @@ body {
     height: 240px;
   }
 
-  /* Switch table to card layout on small mobile screens */
   .desktop-table {
     display: none;
   }

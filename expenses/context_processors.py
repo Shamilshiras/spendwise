@@ -2,9 +2,6 @@ from django.utils import timezone
 
 
 def app_globals(request):
-    """
-    Context processor providing global variables to all templates.
-    """
     today = timezone.localdate()
     return {
         "today_date": today,
