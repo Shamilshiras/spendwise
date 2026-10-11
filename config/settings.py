@@ -51,6 +51,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+try:
+    import whitenoise  # noqa: F401
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except ImportError:
+    pass
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -75,6 +81,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Uses MySQL if configured or DB_ENGINE=mysql, otherwise defaults to SQLite for easy local execution.
 DB_ENGINE = os.environ.get('DB_ENGINE', '').lower()
 if DB_ENGINE == 'mysql' or (os.environ.get('DB_NAME') and os.environ.get('USE_MYSQL', '').lower() in ('true', '1', 'yes')):
+    mysql_options = {
+        'charset': 'utf8mb4',
+    }
+    if os.environ.get('DB_SSL', '').lower() in ('true', '1', 'yes'):
+        mysql_options['ssl'] = {'verify_mode': False}
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -83,9 +95,7 @@ if DB_ENGINE == 'mysql' or (os.environ.get('DB_NAME') and os.environ.get('USE_MY
             'PASSWORD': os.environ.get('DB_PASSWORD', ''),
             'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
             'PORT': os.environ.get('DB_PORT', '3306'),
-            'OPTIONS': {
-                'charset': 'utf8mb4',
-            },
+            'OPTIONS': mysql_options,
         }
     }
 else:
