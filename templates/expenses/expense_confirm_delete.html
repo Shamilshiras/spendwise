@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load inr_filters %}
+
+{% block title %}Confirm Delete | {{ app_title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 520px; margin: 2rem auto;">
+  <div class="card" style="border-color: #fecaca;">
+    <div class="card-header" style="background-color: var(--danger-light); border-bottom-color: #fecaca;">
+      <h1 class="card-title" style="color: #991b1b; display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        Confirm Expense Deletion
+      </h1>
+    </div>
+
+    <div class="card-body">
+      <p style="font-size: 0.95rem; color: var(--gray-700); margin-bottom: 1.25rem;">
+        Are you sure you want to permanently delete this expense record? This action cannot be undone.
+      </p>
+
+      <!-- Expense Summary Card -->
+      <div style="background-color: var(--gray-50); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-{{ expense.category.name }}">{{ expense.category.name }}</span>
+          <span style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900);">{{ expense.amount|inr }}</span>
+        </div>
+        <div style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.35rem;">
+          <strong>Date:</strong> {{ expense.date|date:"d F Y" }}
+        </div>
+        {% if expense.description %}
+        <div style="font-size: 0.875rem; color: var(--gray-600);">
+          <strong>Note:</strong> {{ expense.description }}
+        </div>
+        {% endif %}
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+          <a href="{% url 'expense_list' %}" class="btn btn-secondary">
+            Cancel
+          </a>
+          <button type="submit" class="btn btn-danger">
+            Yes, Delete Expense
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

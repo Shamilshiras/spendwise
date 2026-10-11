@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load inr_filters %}
+
+{% block title %}All Expenses | {{ app_title }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div>
+    <h1 class="page-title">All Expenses</h1>
+    <p class="page-subtitle">Search, filter, sort, and manage all your expense records</p>
+  </div>
+  <div>
+    <a href="{% url 'expense_create' %}" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+      Add Expense
+    </a>
+  </div>
+</div>
+
+<!-- Filter / Search / Sort Form -->
+<div class="filter-card">
+  <form method="get" action="{% url 'expense_list' %}">
+    <div class="filter-grid">
+      <!-- Category Filter -->
+      <div class="form-group">
+        <label class="form-label" for="categorySelect">Category</label>
+        <select name="category" id="categorySelect" class="form-select">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-group">
+        <label class="form-label" for="startDate">From Date</label>
+        <input 
+          type="date" 
+          name="start_date" 
+          id="startDate" 
+          class="form-control" 
+          value="{{ start_date }}"
+        >
+      </div>
+
+      <!-- End Date -->
+      <div class="form-group">
+        <label class="form-label" for="endDate">To Date</label>
+        <input 
+          type="date" 
+          name="end_date" 
+          id="endDate" 
+          class="form-control" 
+          value="{{ end_date }}"
+        >
+      </div>
+
+      <!-- Search in Description -->
+      <div class="form-group">
+        <label class="form-label" for="searchQuery">Search Description</label>
+        <input 
+          type="text" 
+          name="q" 
+          id="searchQuery" 
+          class="form-control" 
+          placeholder="e.g. Lunch, Uber, Wifi..." 
+          value="{{ search_query }}"
+        >
+      </div>
+
+      <!-- Sort By -->
+      <div class="form-group">
+        <label class="form-label" for="sortBy">Sort By</label>
+        <select name="sort" id="sortBy" class="form-select">
+          <option value="-date" {% if sort_by == "-date" %}selected{% endif %}>Date: Newest First</option>
+          <option value="date" {% if sort_by == "date" %}selected{% endif %}>Date: Oldest First</option>
+          <option value="-amount" {% if sort_by == "-amount" %}selected{% endif %}>Amount: Highest First</option>
+          <option value="amount" {% if sort_by == "amount" %}selected{% endif %}>Amount: Lowest First</option>
+        </select>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="filter-actions">
+        <button type="submit" class="btn btn-primary" style="flex: 1;">Filter</button>
+        {% if selected_category or start_date or end_date or search_query or sort_by != "-date" %}
+        <a href="{% url 'expense_list' %}" class="btn btn-secondary" title="Clear Filters">Reset</a>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Results Summary Header -->
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; padding: 0.5rem 0.25rem;">
+  <div style="font-size: 0.9rem; color: var(--gray-600);">
+    Showing <strong>{{ page_obj.paginator.count }}</strong> expense{{ page_obj.paginator.count|pluralize }}
+    {% if selected_category or start_date or end_date or search_query %}
+    <span style="color: var(--primary); font-weight: 500;">(filtered)</span>
+    {% endif %}
+  </div>
+  <div style="font-size: 0.95rem; font-weight: 600; color: var(--gray-800);">
+    Total: <span style="color: var(--primary);">{{ filtered_total|inr }}</span>
+  </div>
+</div>
+
+<!-- Main Expenses Container -->
+<div class="card" style="margin-bottom: 1rem;">
+  {% if page_obj.object_list %}
+  
+  <!-- Desktop / Tablet Table -->
+  <div class="table-responsive desktop-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th class="amount-col">Amount</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in page_obj.object_list %}
+        <tr>
+          <td style="font-weight: 500;">{{ expense.date|date:"d M Y" }}</td>
+          <td>
+            <span class="badge badge-{{ expense.category.name }}">
+              {{ expense.category.name }}
+            </span>
+          </td>
+          <td>{{ expense.description|default:"—" }}</td>
+          <td class="amount-col">{{ expense.amount|inr }}</td>
+          <td class="actions-col">
+            <a href="{% url 'expense_update' expense.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+            <a href="{% url 'expense_delete' expense.pk %}" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">Delete</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Mobile Card List for small screens -->
+  <div class="mobile-card-list" style="padding: 0.75rem;">
+    {% for expense in page_obj.object_list %}
+    <div class="mobile-expense-card">
+      <div class="mobile-expense-header">
+        <span class="badge badge-{{ expense.category.name }}">{{ expense.category.name }}</span>
+        <span style="font-size: 1.05rem; font-weight: 700; color: var(--gray-900);">{{ expense.amount|inr }}</span>
+      </div>
+      <div class="mobile-expense-body">
+        {% if expense.description %}{{ expense.description }}{% else %}<span style="color: var(--gray-400);">No description</span>{% endif %}
+      </div>
+      <div class="mobile-expense-footer">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">{{ expense.date|date:"d M Y" }}</span>
+        <div>
+          <a href="{% url 'expense_update' expense.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+          <a href="{% url 'expense_delete' expense.pk %}" class="btn btn-secondary btn-sm" style="color: var(--danger); border-color: #fecaca;">Delete</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="empty-state">
+    <div class="empty-state-icon">🔍</div>
+    <h3 class="empty-state-title">No expenses found</h3>
+    {% if selected_category or start_date or end_date or search_query %}
+    <p class="empty-state-text">No expenses matched your filter criteria. Try adjusting or clearing your filters.</p>
+    <a href="{% url 'expense_list' %}" class="btn btn-secondary">Clear Filters</a>
+    {% else %}
+    <p class="empty-state-text">You haven't recorded any expenses yet. Click below to add your first expense.</p>
+    <a href="{% url 'expense_create' %}" class="btn btn-primary">Add New Expense</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<!-- Pagination Controls -->
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  <div style="font-size: 0.85rem; color: var(--text-muted);">
+    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  </div>
+  <div class="pagination-links">
+    {% if page_obj.has_previous %}
+    <a href="?page=1{% if preserved_query_params %}&{{ preserved_query_params }}{% endif %}" class="btn btn-secondary btn-sm">&laquo; First</a>
+    <a href="?page={{ page_obj.previous_page_number }}{% if preserved_query_params %}&{{ preserved_query_params }}{% endif %}" class="btn btn-secondary btn-sm">Previous</a>
+    {% endif %}
+
+    <span class="btn btn-primary btn-sm" style="cursor: default;">{{ page_obj.number }}</span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if preserved_query_params %}&{{ preserved_query_params }}{% endif %}" class="btn btn-secondary btn-sm">Next</a>
+    <a href="?page={{ page_obj.paginator.num_pages }}{% if preserved_query_params %}&{{ preserved_query_params }}{% endif %}" class="btn btn-secondary btn-sm">Last &raquo;</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

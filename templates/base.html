@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_title }} — {{ app_tagline }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <!-- Chart.js local vendor bundle -->
+  <script src="{% static 'vendor/chart.umd.min.js' %}"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'dashboard' %}" class="brand">
+        <span class="brand-icon">₹</span>
+        <div class="brand-text">
+          <span class="brand-name">{{ app_title }}</span>
+          <span class="brand-tagline">{{ app_tagline }}</span>
+        </div>
+      </a>
+
+      {% if user.is_authenticated %}
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li>
+          <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'expense_list' %}" class="nav-link {% if request.resolver_match.url_name == 'expense_list' %}active{% endif %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            All Expenses
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'expense_create' %}" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            Add Expense
+          </a>
+        </li>
+
+        <li class="nav-user-controls">
+          <span class="user-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            {{ user.username }}
+          </span>
+          <a href="{% url 'logout' %}" class="btn btn-secondary btn-sm" title="Log out">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Logout
+          </a>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    <!-- Messages / Alerts -->
+    {% if messages %}
+    <div class="alerts-container">
+      {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <script>
+    // Mobile navigation toggle
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+      });
+    }
+
+    // Indian Rupee JS Formatter
+    function formatINR(val) {
+      if (val === null || val === undefined) return '₹0';
+      const num = Number(val);
+      if (isNaN(num)) return '₹' + val;
+
+      const isNegative = num < 0;
+      const absVal = Math.abs(num);
+      const parts = absVal.toFixed(2).split('.');
+      let intPart = parts[0];
+      const decPart = parts[1];
+
+      let formattedInt = '';
+      if (intPart.length <= 3) {
+        formattedInt = intPart;
+      } else {
+        const lastThree = intPart.substring(intPart.length - 3);
+        let remaining = intPart.substring(0, intPart.length - 3);
+        const groups = [];
+        while (remaining.length > 0) {
+          groups.unshift(remaining.slice(-2));
+          remaining = remaining.slice(0, -2);
+        }
+        formattedInt = groups.join(',') + ',' + lastThree;
+      }
+
+      const sign = isNegative ? '-' : '';
+      if (decPart && decPart !== '00') {
+        return `${sign}₹${formattedInt}.${decPart}`;
+      }
+      return `${sign}₹${formattedInt}`;
+    }
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
